@@ -6,16 +6,10 @@ import org.example.routeplaner.application.dto.command.transport.TransportationU
 import org.example.routeplaner.application.dto.response.route.TransportDto;
 import org.example.routeplaner.application.dto.response.transportation.TransportLocationDto;
 import org.example.routeplaner.application.dto.response.transportation.TransportationResponse;
-import org.example.routeplaner.application.dto.response.transportation.TransportationTypeResponse;
 import org.example.routeplaner.domain.model.aggregate.Transportation;
-import org.example.routeplaner.domain.model.aggregate.TransportationType;
 import org.example.routeplaner.domain.ports.output.repository.LocationRepository;
 import org.example.routeplaner.domain.ports.output.repository.TransportationRepository;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Component

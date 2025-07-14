@@ -11,12 +11,10 @@ import org.example.routeplaner.application.dto.command.transport.TransportationU
 import org.example.routeplaner.application.dto.response.transportation.TransportationResponse;
 import org.example.routeplaner.application.dto.response.transportation.TransportationTypeResponse;
 import org.example.routeplaner.application.ports.input.TransportationApplicationService;
-import org.example.routeplaner.domain.model.aggregate.TransportationType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Validated

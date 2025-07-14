@@ -8,10 +8,15 @@ import org.example.routeplaner.application.dto.command.transport.TransportationC
 import org.example.routeplaner.application.dto.command.transport.TransportationUpdateCommand;
 import org.example.routeplaner.application.dto.response.transportation.TransportationResponse;
 import org.example.routeplaner.application.mapper.TransportationMapper;
+import org.example.routeplaner.application.ports.output.TransformationApplicationRepository;
 import org.example.routeplaner.domain.model.aggregate.Transportation;
 import org.example.routeplaner.domain.ports.output.repository.TransportationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,17 +24,26 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class TransportationApplicationServiceImplTest {
 
+    @Mock
     private TransportationRepository transportationRepository;
+    @Mock
     private TransportationMapper transportationMapper;
+
+    @MockitoBean
     private TransportationApplicationServiceImpl service;
 
     @BeforeEach
     void setUp() {
         transportationRepository = mock(TransportationRepository.class);
         transportationMapper = mock(TransportationMapper.class);
-        service = mock(TransportationApplicationServiceImpl.class);
+        service = new TransportationApplicationServiceImpl(
+                transportationMapper,
+                transportationRepository,
+                mock(TransformationApplicationRepository.class)
+        );
     }
 
     @Test
@@ -45,21 +59,9 @@ class TransportationApplicationServiceImplTest {
     }
 
     @Test
-    void testUpdate() {
-        TransportationUpdateCommand command = mock(TransportationUpdateCommand.class);
-        when(command.getId()).thenReturn(UUID.randomUUID());
-
-        service.update(command);
-
-        verify(service).update(command);
-    }
-
-    @Test
     void testUpdateThrowsIfIdNull() {
         TransportationUpdateCommand command = mock(TransportationUpdateCommand.class);
         when(command.getId()).thenReturn(null);
-        doThrow(new IllegalArgumentException("Transportation ID must not be null for update."))
-                .when(service).update(command);
 
         assertThrows(IllegalArgumentException.class, () -> service.update(command));
     }

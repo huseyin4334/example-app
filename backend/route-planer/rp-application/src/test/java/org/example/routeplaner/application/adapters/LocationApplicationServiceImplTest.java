@@ -8,6 +8,7 @@ import org.example.routeplaner.application.dto.command.location.LocationCreateCo
 import org.example.routeplaner.application.dto.response.location.LocationResponse;
 import org.example.routeplaner.application.mapper.LocationMapper;
 import org.example.routeplaner.application.ports.output.LocationApplicationRepository;
+import org.example.routeplaner.domain.model.aggregate.City;
 import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.domain.ports.output.repository.LocationRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,12 @@ class LocationApplicationServiceImplTest {
     void testCreate() {
         LocationCreateCommand command = new LocationCreateCommand("id", "Name", 1L, "CODE");
         Location location = new Location();
+        location.setId(UUID.randomUUID());
+        location.setName("Name");
+        location.setLocationCode("CODE");
+        City city = new City();
+        city.setId(2L);
+        location.setCity(city);
         when(locationMapper.toDomain(command)).thenReturn(location);
 
         service.create(command);
@@ -50,6 +57,11 @@ class LocationApplicationServiceImplTest {
         LocationCreateCommand command = new LocationCreateCommand(UUID.randomUUID().toString(), "Name", 1L, "CODE");
         Location location = new Location();
         location.setId(UUID.randomUUID());
+        location.setName("Name");
+        location.setLocationCode("CODE");
+        City city = new City();
+        city.setId(2L);
+        location.setCity(city);
         when(locationMapper.toDomain(command)).thenReturn(location);
 
         service.update(command);

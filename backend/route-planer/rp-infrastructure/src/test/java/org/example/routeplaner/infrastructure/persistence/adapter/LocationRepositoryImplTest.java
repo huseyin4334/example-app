@@ -1,44 +1,44 @@
 package org.example.routeplaner.infrastructure.persistence.adapter;
 
-import org.example.routeplaner.domain.model.aggregate.City;
-import org.example.routeplaner.domain.model.aggregate.Country;
 import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.infrastructure.persistence.entity.CityEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CountryEntity;
-import org.example.routeplaner.infrastructure.persistence.mapper.LocationEntityMapper;
 import org.example.routeplaner.infrastructure.persistence.mapper.RegionEntitiesMapper;
 import org.example.routeplaner.infrastructure.persistence.repository.CityEntityRepository;
 import org.example.routeplaner.infrastructure.persistence.repository.CountryEntityRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
-@Import({LocationRepositoryImpl.class, LocationEntityMapper.class})
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class LocationRepositoryImplTest {
 
     @Autowired
     LocationRepositoryImpl locationRepository;
 
-    Location location;
-    CountryEntity country;
-
     @Autowired
     CityEntityRepository cityEntityRepository;
+
     @Autowired
     CountryEntityRepository countryEntityRepository;
+
     @Autowired
     RegionEntitiesMapper regionEntitiesMapper;
 
+    Location location;
+    CountryEntity country;
+
     @BeforeEach
     void setUp() {
-        country.setCode("TestCountryCode");
+        country = new CountryEntity();
+        country.setCode("TR");
         country.setName("TestCountryName");
         CityEntity city = new CityEntity();
         city.setName("TestCityName");
@@ -87,6 +87,9 @@ class LocationRepositoryImplTest {
         city.setName("UpdatedCity");
         city.setCountry(country);
         location.setName("UpdatedCity");
+        cityEntityRepository.save(city);
+
+        location.setCity(regionEntitiesMapper.toCity(city));
         locationRepository.update(location);
         Location updated = locationRepository.findById(location.getId());
         CityEntity cityEntity = cityEntityRepository.findByLocationId(updated.getId());

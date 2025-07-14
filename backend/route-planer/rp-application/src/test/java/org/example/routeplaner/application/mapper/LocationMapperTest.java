@@ -3,6 +3,7 @@ package org.example.routeplaner.application.mapper;
 import org.example.routeplaner.application.dto.command.location.LocationCreateCommand;
 import org.example.routeplaner.application.dto.response.location.LocationResponse;
 import org.example.routeplaner.domain.model.aggregate.City;
+import org.example.routeplaner.domain.model.aggregate.Country;
 import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.domain.ports.output.repository.RegionRepository;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,12 @@ class LocationMapperTest {
         city.setName("Test City");
         l.setCity(city);
         l.setLocationCode("CODE");
+        Country country = new Country();
+        country.setCode("COUNTRY_CODE");
+        country.setName("Country Name");
+        city.setCountry(country);
+
+        l.setCity(city);
         
         RegionRepository regionRepository = Mockito.mock(RegionRepository.class);
         LocationMapper mapper = new LocationMapper(regionRepository);

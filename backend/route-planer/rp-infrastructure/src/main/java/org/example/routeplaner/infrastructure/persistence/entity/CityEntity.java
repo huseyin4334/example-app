@@ -7,7 +7,7 @@ import org.example.common.infrastructure.entity.BasePersistenceEntity;
 
 @Getter @Setter
 @Entity
-@Table(name = "cities")
+@Table(name = "cities", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "country_id"}))
 public class CityEntity extends BasePersistenceEntity<Long> {
 
     @Id

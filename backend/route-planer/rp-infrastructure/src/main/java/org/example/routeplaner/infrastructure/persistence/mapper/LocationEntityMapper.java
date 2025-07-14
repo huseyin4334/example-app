@@ -1,10 +1,7 @@
 package org.example.routeplaner.infrastructure.persistence.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.example.routeplaner.domain.model.aggregate.City;
-import org.example.routeplaner.domain.model.aggregate.Country;
 import org.example.routeplaner.domain.model.aggregate.Location;
-import org.example.routeplaner.infrastructure.persistence.entity.CityEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.LocationEntity;
 import org.example.routeplaner.infrastructure.persistence.repository.CityEntityRepository;
 import org.springframework.stereotype.Component;

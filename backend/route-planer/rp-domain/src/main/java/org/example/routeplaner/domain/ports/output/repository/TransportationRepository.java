@@ -1,6 +1,5 @@
 package org.example.routeplaner.domain.ports.output.repository;
 
-import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.domain.model.aggregate.Transportation;
 import org.example.routeplaner.domain.model.aggregate.TransportationType;
 import org.example.routeplaner.domain.model.criteria.LocationCriteria;

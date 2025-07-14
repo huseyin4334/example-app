@@ -14,11 +14,12 @@ import java.util.UUID;
 
 @Getter @Setter
 @Entity
-@Table(name = "locations", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "city", "country"}))
+@Table(name = "locations", uniqueConstraints = @UniqueConstraint(columnNames = {"name", "city_id"}))
 public class LocationEntity extends BasePersistenceEntity<UUID> {
     @Id
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     @GeneratedValue
+    @Column(name = "location_id", nullable = false, updatable = false)
     private UUID id;
 
     private String name;

@@ -1,26 +1,23 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
-    container_name: route-planner-db
+    image: postgres:latest
+    container_name: postgres_container
     environment:
-      POSTGRES_DB: routeplanner
-      POSTGRES_USER: routeplanner
-      POSTGRES_PASSWORD: routeplanner123
+      POSTGRES_USER: example_user
+      POSTGRES_PASSWORD: example_password
+      POSTGRES_DB: example_db
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - route-planner-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U routeplanner -d routeplanner"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "pg_isready -U example_user -d example_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # Backend Spring Boot Application
   backend:
@@ -30,24 +27,11 @@ services:
     container_name: route-planner-backend
     ports:
       - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/routeplanner
-      - SPRING_DATASOURCE_USERNAME=routeplanner
-      - SPRING_DATASOURCE_PASSWORD=routeplanner123
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_JPA_SHOW_SQL=true
     depends_on:
-      postgres:
+      postgres: 
         condition: service_healthy
     networks:
       - route-planner-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
 
   # Frontend Angular Application
   frontend:
@@ -56,14 +40,12 @@ services:
       dockerfile: Dockerfile
     container_name: route-planner-frontend
     ports:
-      - "3000:80"
+      - "4200:80"
     depends_on:
       backend:
-        condition: service_healthy
+        condition: service_started
     networks:
       - route-planner-network
-    environment:
-      - API_URL=http://backend:8080
 
 # Networks
 networks:

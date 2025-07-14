@@ -1,6 +1,5 @@
 package org.example.routeplaner.domain.model.aggregate;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.common.domain.entity.BaseEntity;

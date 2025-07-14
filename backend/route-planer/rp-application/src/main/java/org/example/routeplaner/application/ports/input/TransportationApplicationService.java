@@ -6,7 +6,6 @@ import org.example.routeplaner.application.dto.command.transport.TransportationU
 import org.example.routeplaner.application.dto.response.transportation.TransportationResponse;
 import org.example.routeplaner.application.dto.response.transportation.TransportationTypeResponse;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface TransportationApplicationService extends BasePageService<UUID, TransportationResponse> {

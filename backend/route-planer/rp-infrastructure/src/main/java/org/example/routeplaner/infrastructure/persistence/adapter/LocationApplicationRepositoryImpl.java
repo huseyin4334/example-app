@@ -8,7 +8,6 @@ import org.example.routeplaner.application.dto.response.location.CountryResponse
 import org.example.routeplaner.application.dto.response.location.SearchableLocationResponse;
 import org.example.routeplaner.application.ports.output.LocationApplicationRepository;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;

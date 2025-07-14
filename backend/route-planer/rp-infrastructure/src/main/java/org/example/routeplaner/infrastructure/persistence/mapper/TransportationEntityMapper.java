@@ -5,7 +5,6 @@ import org.example.routeplaner.domain.model.aggregate.Transportation;
 import org.example.routeplaner.domain.model.aggregate.TransportationType;
 import org.example.routeplaner.infrastructure.persistence.entity.TransportationEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.TransportationTypeEntity;
-import org.example.routeplaner.infrastructure.persistence.repository.TransportationTypeEntityRepository;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor

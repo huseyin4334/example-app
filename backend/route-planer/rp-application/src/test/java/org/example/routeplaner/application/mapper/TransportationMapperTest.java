@@ -57,8 +57,10 @@ class TransportationMapperTest {
     @Test
     void testToTransportDtoAndResponse() {
         Location origin = new Location();
+        origin.setId(UUID.randomUUID());
         origin.setName("Origin");
         Location dest = new Location();
+        dest.setId(UUID.randomUUID());
         dest.setName("Dest");
         Transportation t = new Transportation();
         t.setId(UUID.randomUUID());
@@ -81,8 +83,8 @@ class TransportationMapperTest {
 
         TransportationResponse resp = mapper.toTransportResponse(t);
         assertEquals(t.getId().toString(), resp.getId());
-        assertEquals("Origin", resp.getOrigin());
-        assertEquals("Dest", resp.getDestination());
+        assertEquals("Origin", resp.getOrigin().getName());
+        assertEquals("Dest", resp.getDestination().getName());
         assertEquals(Arrays.asList("MONDAY", "FRIDAY"), resp.getAvailableDays());
     }
 }

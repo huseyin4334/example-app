@@ -1,6 +1,5 @@
 package org.example.routeplaner.application.ports.input;
 
-import org.example.common.application.BaseCommand;
 import org.example.common.application.BaseListResponse;
 import org.example.common.application.BaseResponse;
 import org.example.routeplaner.application.dto.command.DeleteCommand;

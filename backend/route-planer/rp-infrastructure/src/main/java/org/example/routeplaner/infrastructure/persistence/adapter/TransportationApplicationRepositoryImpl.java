@@ -3,9 +3,7 @@ package org.example.routeplaner.infrastructure.persistence.adapter;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.example.routeplaner.application.dto.response.location.SearchableLocationResponse;
 import org.example.routeplaner.application.dto.response.transportation.TransportationTypeResponse;
-import org.example.routeplaner.application.ports.output.LocationApplicationRepository;
 import org.example.routeplaner.application.ports.output.TransformationApplicationRepository;
 import org.springframework.stereotype.Repository;
 
