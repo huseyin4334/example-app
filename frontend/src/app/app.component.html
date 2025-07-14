@@ -1,0 +1,34 @@
+<div class="app-container">
+  <!-- Navigation Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1 class="app-title">{{title}}</h1>
+      <nav class="app-nav">
+        <a routerLink="/locations" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">📍</span>
+          Lokasyonlar
+        </a>
+        <a routerLink="/transports" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🚍</span>
+          Ulaşım Araçları
+        </a>
+        <a routerLink="/route-calculator" routerLinkActive="active" class="nav-link">
+          <span class="nav-icon">🗺️</span>
+          Route Hesaplama
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>&copy; 2025 Lokasyon ve Ulaşım Yönetim Sistemi</p>
+    </div>
+  </footer>
+</div>

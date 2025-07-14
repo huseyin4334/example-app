@@ -1,0 +1,275 @@
+<div class="locations-container">
+  <div class="header">
+    <h1>Lokasyon Yönetimi</h1>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Yükleniyor...</p>
+  </div>
+
+  <div class="content" [class.loading]="loading">
+    <!-- Arama Bölümü -->
+    <div class="search-section">
+      <div class="search-group">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Lokasyon ara..."
+          class="search-input"
+          (keyup.enter)="onSearch()">
+        <button class="btn btn-primary" (click)="onSearch()">Ara</button>
+        <button class="btn btn-secondary" (click)="searchTerm = ''; onSearch()">Temizle</button>
+      </div>
+    </div>
+
+    <!-- Yeni Lokasyon Ekleme Formu -->
+    <div class="form-section" *ngIf="!isEditing">
+      <h2>Yeni Lokasyon Ekle</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Lokasyon Adı:</label>
+          <input 
+            type="text" 
+            id="name"
+            [(ngModel)]="newLocation.name" 
+            placeholder="Lokasyon adını girin (min 5 karakter)"
+            class="form-control"
+            minlength="5"
+            maxlength="256"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="country">Ülke:</label>
+          <select 
+            id="country"
+            [(ngModel)]="selectedCountryId" 
+            (ngModelChange)="onCountryChange($event)"
+            class="form-control"
+            required>
+            <option [value]="null">Ülke seçin</option>
+            <option *ngFor="let country of countries" [value]="country.id">
+              {{country.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="city">Şehir:</label>
+          <select 
+            id="city"
+            [(ngModel)]="newLocation.city" 
+            class="form-control"
+            [disabled]="!selectedCountryId"
+            required>
+            <option value="0">Şehir seçin</option>
+            <option *ngFor="let city of availableCities" [value]="city.id">
+              {{city.name}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="locationCode">Lokasyon Kodu:</label>
+          <input 
+            type="text" 
+            id="locationCode"
+            [(ngModel)]="newLocation.locationCode" 
+            placeholder="Lokasyon kodu (2-16 karakter)"
+            class="form-control"
+            minlength="2"
+            maxlength="16"
+            required>
+        </div>
+      </div>
+      
+      <button 
+        class="btn btn-primary" 
+        (click)="createLocation()"
+        [disabled]="!isValidLocation(newLocation) || loading">
+        <span *ngIf="loading">Ekleniyor...</span>
+        <span *ngIf="!loading">Lokasyon Ekle</span>
+      </button>
+    </div>
+
+    <!-- Lokasyon Düzenleme Formu -->
+    <div class="form-section" *ngIf="isEditing && selectedLocation">
+      <h2>Lokasyon Düzenle</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editName">Lokasyon Adı:</label>
+          <input 
+            type="text" 
+            id="editName"
+            [(ngModel)]="selectedLocation.name" 
+            class="form-control"
+            minlength="5"
+            maxlength="256"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="editCountry">Ülke:</label>
+          <select 
+            id="editCountry"
+            [(ngModel)]="selectedCountryId" 
+            (ngModelChange)="onCountryChange($event)"
+            class="form-control"
+            required>
+            <option [value]="null">Ülke seçin</option>
+            <option *ngFor="let country of countries" [value]="country.id">
+              {{country.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editCity">Şehir:</label>
+          <select 
+            id="editCity"
+            [(ngModel)]="selectedLocation.city" 
+            class="form-control"
+            [disabled]="!selectedCountryId"
+            required>
+            <option value="0">Şehir seçin</option>
+            <option *ngFor="let city of availableCities" [value]="city.id">
+              {{city.name}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editLocationCode">Lokasyon Kodu:</label>
+          <input 
+            type="text" 
+            id="editLocationCode"
+            [(ngModel)]="selectedLocation.locationCode" 
+            class="form-control"
+            minlength="2"
+            maxlength="16"
+            required>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button 
+          class="btn btn-success" 
+          (click)="updateLocation()"
+          [disabled]="!isValidLocation(selectedLocation) || loading">
+          <span *ngIf="loading">Güncelleniyor...</span>
+          <span *ngIf="!loading">Güncelle</span>
+        </button>
+        <button class="btn btn-secondary" (click)="cancelEdit()" [disabled]="loading">İptal</button>
+      </div>
+    </div>
+
+    <!-- Lokasyon Listesi -->
+    <div class="list-section">
+      <div class="list-header">
+        <h2>Mevcut Lokasyonlar</h2>
+        <div class="list-info" *ngIf="totalItems > 0">
+          <p>Toplam {{totalItems}} lokasyon bulundu</p>
+        </div>
+      </div>
+
+      <div class="locations-table" *ngIf="locations.length > 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Lokasyon Adı</th>
+              <th>Ülke</th>
+              <th>Şehir</th>
+              <th>Lokasyon Kodu</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let location of locations" class="location-row">
+              <td>
+                <div class="location-name">
+                  <strong>{{location.name}}</strong>
+                </div>
+              </td>
+              <td>
+                <span class="country-info">{{location.country}}</span>
+              </td>
+              <td>
+                <span class="city-info">{{location.city}}</span>
+              </td>
+              <td>
+                <span class="location-code">{{location.locationCode}}</span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-sm btn-outline" 
+                    (click)="selectLocation(location)"
+                    [disabled]="loading"
+                    title="Düzenle">
+                    ✏️
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    (click)="deleteLocation(location.id!)"
+                    [disabled]="loading"
+                    title="Sil">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(1)" 
+          [disabled]="currentPage === 1 || loading">
+          İlk
+        </button>
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(currentPage - 1)" 
+          [disabled]="currentPage === 1 || loading">
+          Önceki
+        </button>
+        
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          class="btn btn-pagination" 
+          [class.active]="page === currentPage"
+          (click)="onPageChange(page)"
+          [disabled]="loading">
+          {{page}}
+        </button>
+        
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(currentPage + 1)" 
+          [disabled]="currentPage === totalPages || loading">
+          Sonraki
+        </button>
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(totalPages)" 
+          [disabled]="currentPage === totalPages || loading">
+          Son
+        </button>
+      </div>
+      
+      <div class="no-data" *ngIf="locations.length === 0 && !loading">
+        <p *ngIf="searchTerm">
+          "<strong>{{searchTerm}}</strong>" araması için sonuç bulunamadı.
+        </p>
+        <p *ngIf="!searchTerm">
+          Henüz lokasyon bulunmuyor.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

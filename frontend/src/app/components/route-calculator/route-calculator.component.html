@@ -1,0 +1,166 @@
+<div class="route-calculator-container">
+  <div class="header">
+    <h1>Rota Hesaplama</h1>
+    <p class="subtitle">Başlangıç ve hedef lokasyonlarını seçerek en uygun rotayı bulun</p>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="isCalculating">
+    <div class="spinner"></div>
+    <p>Rotalar hesaplanıyor...</p>
+  </div>
+
+  <div class="content" [class.loading]="isCalculating">
+    <!-- Rota Hesaplama Formu -->
+    <div class="form-section">
+      <h2>Rota Bilgileri</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fromLocation">Başlangıç Lokasyonu:</label>
+          <select
+            id="fromLocation"
+            [(ngModel)]="routeRequest.originId"
+            class="form-control"
+            required>
+            <option value="">Başlangıç lokasyonu seçin...</option>
+            <option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}}
+            </option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="toLocation">Hedef Lokasyon:</label>
+          <select
+            id="toLocation"
+            [(ngModel)]="routeRequest.destinationId"
+            class="form-control"
+            required>
+            <option value="">Hedef lokasyon seçin...</option>
+            <option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="travelDate">Seyahat Tarihi:</label>
+          <input
+            type="date"
+            id="travelDate"
+            [(ngModel)]="selectedDate"
+            (change)="onDateChange()"
+            [min]="getTomorrowDate()"
+            class="form-control"
+            required>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button
+          class="btn btn-primary"
+          (click)="calculateRoute()"
+          [disabled]="isCalculating || !routeRequest.originId || !routeRequest.destinationId || !selectedDate">
+          <span *ngIf="isCalculating">Hesaplanıyor...</span>
+          <span *ngIf="!isCalculating">Rota Hesapla</span>
+        </button>
+        <button
+          class="btn btn-secondary"
+          (click)="resetForm()"
+          [disabled]="isCalculating">
+          Temizle
+        </button>
+      </div>
+    </div>
+
+    <!-- Hata Mesajı -->
+    <div class="error-message" *ngIf="error">
+      <p>{{error}}</p>
+    </div>
+  </div>
+
+  <!-- Hesaplama Sonuçları -->
+  <div class="results-section" *ngIf="routeResult && routeResult.availableRoutes">
+    <h2>Mevcut Rotalar</h2>
+    
+    <!-- Rota Kartları -->
+    <div class="routes-grid" *ngIf="routeResult.availableRoutes.length > 0">
+      <div class="route-card" *ngFor="let route of routeResult.availableRoutes; let i = index">
+        <div class="route-header">
+          <h3>Rota Seçeneği {{i + 1}}</h3>
+          <span class="route-badge">3 Segment</span>
+        </div>
+        
+        <!-- Before Flight Segment -->
+        <div class="route-segment" *ngIf="route.beforeFlight">
+          <div class="segment-header">
+            <span class="segment-number">1</span>
+            <span class="segment-title">Başlangıç Segmenti</span>
+          </div>
+          <div class="segment-details">
+            <div class="route-path">
+              <span class="location-name">{{route.beforeFlight.origin}}</span>
+              <span class="arrow">→</span>
+              <span class="location-name">{{route.beforeFlight.destination}}</span>
+            </div>
+            <div class="transport-info">
+              <span class="transport-type">{{getTransportTypeLabel(route.beforeFlight.transportType)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flight Segment -->
+        <div class="route-segment main-segment" *ngIf="route.flight">
+          <div class="segment-header">
+            <span class="segment-number">2</span>
+            <span class="segment-title">Ana Uçuş Segmenti</span>
+          </div>
+          <div class="segment-details">
+            <div class="route-path">
+              <span class="location-name">{{route.flight.origin}}</span>
+              <span class="arrow">✈️</span>
+              <span class="location-name">{{route.flight.destination}}</span>
+            </div>
+            <div class="transport-info flight">
+              <span class="transport-type">{{getTransportTypeLabel(route.flight.transportType)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- After Flight Segment -->
+        <div class="route-segment" *ngIf="route.afterFlight">
+          <div class="segment-header">
+            <span class="segment-number">3</span>
+            <span class="segment-title">Varış Segmenti</span>
+          </div>
+          <div class="segment-details">
+            <div class="route-path">
+              <span class="location-name">{{route.afterFlight.origin}}</span>
+              <span class="arrow">→</span>
+              <span class="location-name">{{route.afterFlight.destination}}</span>
+            </div>
+            <div class="transport-info">
+              <span class="transport-type">{{getTransportTypeLabel(route.afterFlight.transportType)}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rota Bulunamadı -->
+    <div class="no-routes" *ngIf="routeResult.availableRoutes.length === 0">
+      <div class="no-routes-content">
+        <h3>Rota Bulunamadı</h3>
+        <p>Seçtiğiniz lokasyonlar ve tarih için uygun rota bulunamadı.</p>
+        <ul>
+          <li>Farklı bir tarih seçmeyi deneyin</li>
+          <li>Başlangıç veya hedef lokasyonu değiştirin</li>
+          <li>Ulaşım bağlantılarının mevcut olduğundan emin olun</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

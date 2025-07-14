@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<div class="transports-container">
+  <div class="header">
+    <h1>Ulaşım Yönetimi</h1>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Yükleniyor...</p>
+  </div>
+
+  <div class="content" [class.loading]="loading">
+    <!-- Arama Bölümü -->
+    <div class="search-section">
+      <div class="search-group">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm" 
+          placeholder="Ulaşım bilgisi ara..."
+          class="search-input"
+          (keyup.enter)="onSearch()">
+        <button class="btn btn-primary" (click)="onSearch()">Ara</button>
+        <button class="btn btn-secondary" (click)="searchTerm = ''; onSearch()">Temizle</button>
+      </div>
+    </div>
+
+    <!-- Yeni Ulaşım Bilgisi Ekleme Formu -->
+    <div class="form-section" *ngIf="!isEditing">
+      <h2>Yeni Ulaşım Bilgisi Ekle</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="new-origin">Başlangıç Lokasyonu:</label>
+          <select
+            id="new-origin"
+            [(ngModel)]="newTransportation.origin"
+            name="origin"
+            class="form-control"
+            required>
+            <option value="">Lokasyon seçin</option>
+            <option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}} ({{location.city}}, {{location.country}})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="new-destination">Varış Lokasyonu:</label>
+          <select
+            id="new-destination"
+            [(ngModel)]="newTransportation.destination"
+            name="destination"
+            class="form-control"
+            required>
+            <option value="">Lokasyon seçin</option>
+            <option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}} ({{location.city}}, {{location.country}})
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="new-transport-type">Ulaşım Türü:</label>
+          <select
+            id="new-transport-type"
+            [(ngModel)]="newTransportation.transportationType"
+            name="transportationType"
+            class="form-control"
+            required>
+            <option value="0">Ulaşım türü seçin</option>
+            <option *ngFor="let type of transportationTypes" [value]="type.id">
+              {{type.name}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Geçerli Günler:</label>
+          <div class="days-selection">
+            <div *ngFor="let day of days" class="day-checkbox">
+              <input
+                type="checkbox"
+                [id]="'new-day-' + day"
+                [checked]="isDaySelected(day)"
+                (change)="onDayChange(day, $event)">
+              <label [for]="'new-day-' + day">{{getDayLabel(day)}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <button 
+        class="btn btn-primary" 
+        (click)="createTransportation()"
+        [disabled]="!isValidTransportation(newTransportation) || loading">
+        <span *ngIf="loading">Ekleniyor...</span>
+        <span *ngIf="!loading">Ulaşım Bilgisi Ekle</span>
+      </button>
+    </div>
+
+    <!-- Ulaşım Bilgisi Düzenleme Formu -->
+    <div class="form-section" *ngIf="isEditing && selectedTransportation">
+      <h2>Ulaşım Bilgisi Düzenle</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-origin">Başlangıç Lokasyonu:</label>
+          <select
+            id="edit-origin"
+            [(ngModel)]="selectedTransportation.origin"
+            name="origin"
+            class="form-control"
+            required>
+            <option value="">Lokasyon seçin</option>
+            <option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}} ({{location.city}}, {{location.country}})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-destination">Varış Lokasyonu:</label>
+          <select
+            id="edit-destination"
+            [(ngModel)]="selectedTransportation.destination"
+            name="destination"
+            class="form-control"
+            required>
+            <option value="">Lokasyon seçin</option>
+            <option *ngFor="let location of locations" [value]="location.id">
+              {{location.name}} ({{location.city}}, {{location.country}})
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-transport-type">Ulaşım Türü:</label>
+          <select
+            id="edit-transport-type"
+            [(ngModel)]="selectedTransportation.transportationType"
+            name="transportationType"
+            class="form-control"
+            required>
+            <option value="0">Ulaşım türü seçin</option>
+            <option *ngFor="let type of transportationTypes" [value]="type.id">
+              {{type.name}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Geçerli Günler:</label>
+          <div class="days-selection">
+            <div *ngFor="let day of days" class="day-checkbox">
+              <input
+                type="checkbox"
+                [id]="'edit-day-' + day"
+                [checked]="isDaySelected(day)"
+                (change)="onDayChange(day, $event)">
+              <label [for]="'edit-day-' + day">{{getDayLabel(day)}}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button 
+          class="btn btn-success" 
+          (click)="updateTransportation()"
+          [disabled]="!isValidTransportation(selectedTransportation) || loading">
+          <span *ngIf="loading">Güncelleniyor...</span>
+          <span *ngIf="!loading">Güncelle</span>
+        </button>
+        <button class="btn btn-secondary" (click)="cancelEdit()" [disabled]="loading">İptal</button>
+      </div>
+    </div>
+
+    <!-- Ulaşım Bilgileri Listesi -->
+    <div class="list-section">
+      <div class="list-header">
+        <h2>Mevcut Ulaşım Bilgileri</h2>
+        <div class="list-info" *ngIf="totalItems > 0">
+          <p>Toplam {{totalItems}} ulaşım bilgisi bulundu</p>
+        </div>
+      </div>
+
+      <div class="transportations-table" *ngIf="transportations.length > 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Başlangıç</th>
+              <th>Varış</th>
+              <th>Ulaşım Türü</th>
+              <th>Geçerli Günler</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transportation of transportations" class="transportation-row">
+              <td>
+                <div class="location-name">
+                  <strong>{{transportation.origin.name}}</strong>
+                </div>
+              </td>
+              <td>
+                <div class="location-name">
+                  <strong>{{transportation.destination.name}}</strong>
+                </div>
+              </td>
+              <td>
+                <span class="transport-type">{{getTransportTypeLabel(transportation.transportType)}}</span>
+              </td>
+              <td>
+                <div class="days-list">
+                  <span *ngFor="let day of transportation.availableDays" class="day-tag">
+                    {{getDayLabel(day)}}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button 
+                    class="btn btn-sm btn-outline" 
+                    (click)="selectTransportation(transportation)"
+                    [disabled]="loading"
+                    title="Düzenle">
+                    ✏️
+                  </button>
+                  <button 
+                    class="btn btn-sm btn-danger" 
+                    (click)="deleteTransportation(transportation.id)"
+                    [disabled]="loading"
+                    title="Sil">
+                    🗑️
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(0)" 
+          [disabled]="currentPage === 0 || loading">
+          İlk
+        </button>
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(currentPage - 1)" 
+          [disabled]="currentPage === 0 || loading">
+          Önceki
+        </button>
+        
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          class="btn btn-pagination" 
+          [class.active]="(page - 1) === currentPage"
+          (click)="onPageChange(page - 1)"
+          [disabled]="loading">
+          {{page}}
+        </button>
+        
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(currentPage + 1)" 
+          [disabled]="currentPage === (totalPages - 1) || loading">
+          Sonraki
+        </button>
+        <button 
+          class="btn btn-pagination" 
+          (click)="onPageChange(totalPages - 1)" 
+          [disabled]="currentPage === (totalPages - 1) || loading">
+          Son
+        </button>
+      </div>
+      
+      <div class="no-data" *ngIf="transportations.length === 0 && !loading">
+        <p *ngIf="searchTerm">
+          "<strong>{{searchTerm}}</strong>" araması için sonuç bulunamadı.
+        </p>
+        <p *ngIf="!searchTerm">
+          Henüz ulaşım bilgisi bulunmuyor.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
