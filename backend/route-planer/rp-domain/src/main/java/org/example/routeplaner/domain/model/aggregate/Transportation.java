@@ -31,7 +31,10 @@ public class Transportation extends AggregateRoot<UUID> {
             throw new IllegalArgumentException("Available days must not be null.");
         }
 
-        if (!origin.getCity().getCountry().equals(destination.getCity().getCountry())) {
+        if (
+                !transportationType.getName().equals("FLIGHT") &&
+                !origin.getCity().getCountry().equals(destination.getCity().getCountry())
+        ) {
             throw new IllegalArgumentException("Origin and destination must be in the same country.");
         }
     }
