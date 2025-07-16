@@ -1,5 +1,6 @@
 package org.example.routeplaner.application.mapper;
 
+import org.example.common.TransportConstants;
 import org.example.routeplaner.application.dto.response.route.AvailableRouteDto;
 import org.example.routeplaner.application.dto.response.route.TransportDto;
 import org.example.routeplaner.domain.model.aggregate.Location;
@@ -32,7 +33,7 @@ class RouteMapperTest {
         before.setOrigin(new Location());
         before.setId(UUID.randomUUID());
         Transportation flight = new Transportation();
-        flight.setTransportationType(transportationType("FLIGHT"));
+        flight.setTransportationType(transportationType(TransportConstants.FLIGHT));
         flight.setOrigin(new Location());
         flight.setId(UUID.randomUUID());
         Transportation after = new Transportation();

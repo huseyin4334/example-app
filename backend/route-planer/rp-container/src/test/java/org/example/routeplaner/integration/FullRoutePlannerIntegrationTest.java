@@ -1,6 +1,7 @@
 package org.example.routeplaner.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.common.TransportConstants;
 import org.example.common.domain.entity.Day;
 import org.example.routeplaner.application.dto.command.location.LocationCreateCommand;
 import org.example.routeplaner.application.dto.command.route.AvailableRoutesQuery;
@@ -88,7 +89,7 @@ class FullRoutePlannerIntegrationTest {
         // AirportA -> AirportB (FLIGHT, MONDAY, FRIDAY)
         createTransportation(airportAId, airportBId,
                 List.of(Day.MONDAY, Day.FRIDAY),
-                transportationTypeList.get("FLIGHT")
+                transportationTypeList.get(TransportConstants.FLIGHT)
         );
         // AirportB -> Destination (BUS, MONDAY, FRIDAY, SATURDAY, SUNDAY)
         createTransportation(airportBId, destinationId,
@@ -118,9 +119,9 @@ class FullRoutePlannerIntegrationTest {
         transportationTypeList.put("BUS", type.getId());
 
         type = new TransportationTypeEntity();
-        type.setName("FLIGHT");
+        type.setName(TransportConstants.FLIGHT);
         transportationTypeEntityRepository.save(type);
-        transportationTypeList.put("FLIGHT", type.getId());
+        transportationTypeList.put(TransportConstants.FLIGHT, type.getId());
 
         type = new TransportationTypeEntity();
         type.setName("UBER");

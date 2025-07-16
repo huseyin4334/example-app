@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.example.common.TransportConstants;
 import org.example.routeplaner.infrastructure.persistence.entity.AirportEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CityEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CountryEntity;
@@ -76,7 +77,7 @@ public class DataLoader implements CommandLineRunner {
         transportationTypeEntityRepository.save(type);
 
         type = new TransportationTypeEntity();
-        type.setName("FLIGHT");
+        type.setName(TransportConstants.FLIGHT);
         transportationTypeEntityRepository.save(type);
 
         type = new TransportationTypeEntity();

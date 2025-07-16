@@ -1,5 +1,6 @@
 package org.example.routeplaner.domain.service;
 
+import org.example.common.TransportConstants;
 import org.example.common.domain.entity.Day;
 import org.example.routeplaner.domain.exception.RouteDomainException;
 import org.example.routeplaner.domain.model.aggregate.*;
@@ -113,7 +114,7 @@ class DomainServiceImplTest {
         t.setId(UUID.randomUUID());
         t.setOrigin(mockLocation("A"));
         t.setDestination(mockLocation("B"));
-        t.setTransportationType(getTransportationType("FLIGHT"));
+        t.setTransportationType(getTransportationType(TransportConstants.FLIGHT));
         t.setAvailableDays(Arrays.asList(Day.MONDAY, Day.FRIDAY));
         return t;
     }

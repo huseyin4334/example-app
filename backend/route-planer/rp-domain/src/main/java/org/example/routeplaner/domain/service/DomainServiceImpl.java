@@ -3,6 +3,7 @@ package org.example.routeplaner.domain.service;
 import com.google.openlocationcode.OpenLocationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.common.TransportConstants;
 import org.example.common.domain.entity.Day;
 import org.example.routeplaner.domain.exception.RouteDomainException;
 import org.example.routeplaner.domain.model.aggregate.Location;
@@ -96,7 +97,7 @@ public class DomainServiceImpl implements DomainService {
                         .collect(Collectors.toList())
         );
         locationCriteria.setOriginIdList(List.of(origin));
-        locationCriteria.setExcludedTransportationType("FLIGHT");
+        locationCriteria.setExcludedTransportationType(TransportConstants.FLIGHT);
         locationCriteria.setAvailableDay(availableDay);
 
         return transportationRepository.getOriginsByCriteria(locationCriteria);
@@ -109,7 +110,7 @@ public class DomainServiceImpl implements DomainService {
                         .map(t -> t.getOrigin().getId())
                         .collect(Collectors.toList())
         );
-        locationCriteria.setTransportationType("FLIGHT");
+        locationCriteria.setTransportationType(TransportConstants.FLIGHT);
         locationCriteria.setRootOriginId(origin);
         locationCriteria.setAvailableDay(availableDay);
 
@@ -120,7 +121,7 @@ public class DomainServiceImpl implements DomainService {
     private List<Transportation> getAirportToDestinationTransportations(UUID destination, Day availableDay) {
         LocationCriteria locationCriteria = new LocationCriteria();
         locationCriteria.setDestinationIdList(List.of(destination));
-        locationCriteria.setExcludedTransportationType("FLIGHT");
+        locationCriteria.setExcludedTransportationType(TransportConstants.FLIGHT);
         locationCriteria.setAvailableDay(availableDay);
 
         return transportationRepository.getOriginsByCriteria(locationCriteria);

@@ -1,0 +1,748 @@
+{
+	"info": {
+		"_postman_id": "12345678-1234-1234-1234-123456789abc",
+		"name": "Location Transport App API",
+		"description": "Location Transport App için API collection'ı. Bu collection lokasyon yönetimi, ulaşım bilgileri ve rota hesaplama işlemlerini içerir.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🏢 Location Management",
+			"item": [
+				{
+					"name": "1. Search Locations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/locations/search?searchTerm=istanbul&pageNo=0&pageSize=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "istanbul",
+									"description": "Arama terimi (opsiyonel)"
+								},
+								{
+									"key": "pageNo",
+									"value": "0",
+									"description": "Sayfa numarası (0'dan başlar)"
+								},
+								{
+									"key": "pageSize",
+									"value": "10",
+									"description": "Sayfa başına kayıt sayısı"
+								}
+							]
+						},
+						"description": "Lokasyonları arama ve sayfalama ile listeler. Tüm parametreler opsiyoneldir."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/locations/search?searchTerm=istanbul&pageNo=0&pageSize=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"locations",
+										"search"
+									],
+									"query": [
+										{
+											"key": "searchTerm",
+											"value": "istanbul"
+										},
+										{
+											"key": "pageNo",
+											"value": "0"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"items\": [\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"name\": \"İstanbul Havalimanı\",\n      \"city\": \"İstanbul\",\n      \"locationCode\": \"IST\",\n      \"createdAt\": \"2023-07-16T10:30:00Z\"\n    }\n  ],\n  \"page\": 0,\n  \"pageSize\": 10,\n  \"total\": 1,\n  \"totalPages\": 1\n}"
+						}
+					]
+				},
+				{
+					"name": "2. Create Location",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sabiha Gökçen Havalimanı\",\n  \"city\": 1,\n  \"locationCode\": \"SAW\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/locations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations"
+							]
+						},
+						"description": "Yeni bir lokasyon oluşturur."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"Sabiha Gökçen Havalimanı\",\n  \"city\": 1,\n  \"locationCode\": \"SAW\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/locations",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"locations"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\n  \"name\": \"Sabiha Gökçen Havalimanı\",\n  \"city\": \"İstanbul\",\n  \"locationCode\": \"SAW\",\n  \"createdAt\": \"2023-07-16T10:35:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "3. Update Location",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{locationId}}\",\n  \"name\": \"Sabiha Gökçen Havalimanı - Terminal 1\",\n  \"city\": 1,\n  \"locationCode\": \"SAW\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/locations/{{locationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"{{locationId}}"
+							]
+						},
+						"description": "Mevcut bir lokasyonu günceller."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Delete Location",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/locations/{{locationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"{{locationId}}"
+							]
+						},
+						"description": "Bir lokasyonu siler."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Get All Searchable Locations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/locations/all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"all"
+							]
+						},
+						"description": "Tüm aranabilir lokasyonları getirir."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/locations/all",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"locations",
+										"all"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"items\": [\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n      \"name\": \"İstanbul Havalimanı\"\n    },\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\n      \"name\": \"Sabiha Gökçen Havalimanı\"\n    }\n  ],\n  \"page\": 0,\n  \"pageSize\": 100,\n  \"total\": 2,\n  \"totalPages\": 1\n}"
+						}
+					]
+				},
+				{
+					"name": "6. Get Countries with Cities",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/locations/countries",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"locations",
+								"countries"
+							]
+						},
+						"description": "Tüm ülkeleri ve şehirlerini getirir."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/locations/countries",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"locations",
+										"countries"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"name\": \"Türkiye\",\n      \"cities\": [\n        {\n          \"id\": 1,\n          \"name\": \"İstanbul\"\n        },\n        {\n          \"id\": 2,\n          \"name\": \"Ankara\"\n        }\n      ]\n    }\n  ],\n  \"page\": 0,\n  \"pageSize\": 100,\n  \"total\": 1,\n  \"totalPages\": 1\n}"
+						}
+					]
+				}
+			],
+			"description": "Lokasyon yönetimi ile ilgili tüm API işlemleri"
+		},
+		{
+			"name": "🚌 Transportation Management",
+			"item": [
+				{
+					"name": "1. Search Transportations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transportations/search?searchTerm=otobüs&pageNo=0&pageSize=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transportations",
+								"search"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "otobüs",
+									"description": "Arama terimi (opsiyonel)"
+								},
+								{
+									"key": "pageNo",
+									"value": "0",
+									"description": "Sayfa numarası (0'dan başlar)"
+								},
+								{
+									"key": "pageSize",
+									"value": "10",
+									"description": "Sayfa başına kayıt sayısı"
+								}
+							]
+						},
+						"description": "Ulaşım bilgilerini arama ve sayfalama ile listeler."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/transportations/search?searchTerm=otobüs&pageNo=0&pageSize=10",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"transportations",
+										"search"
+									],
+									"query": [
+										{
+											"key": "searchTerm",
+											"value": "otobüs"
+										},
+										{
+											"key": "pageNo",
+											"value": "0"
+										},
+										{
+											"key": "pageSize",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"items\": [\n    {\n      \"id\": \"123e4567-e89b-12d3-a456-426614174100\",\n      \"origin\": {\n        \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n        \"name\": \"İstanbul Havalimanı\"\n      },\n      \"destination\": {\n        \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\n        \"name\": \"Sabiha Gökçen Havalimanı\"\n      },\n      \"transportType\": \"BUS\",\n      \"availableDays\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\"],\n      \"createdAt\": \"2023-07-16T10:40:00Z\"\n    }\n  ],\n  \"page\": 0,\n  \"pageSize\": 10,\n  \"total\": 1,\n  \"totalPages\": 1\n}"
+						}
+					]
+				},
+				{
+					"name": "2. Create Transportation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"origin\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"destination\": \"123e4567-e89b-12d3-a456-426614174001\",\n  \"transportationType\": 1,\n  \"availableDays\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transportations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transportations"
+							]
+						},
+						"description": "Yeni bir ulaşım bilgisi oluşturur."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"origin\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"destination\": \"123e4567-e89b-12d3-a456-426614174001\",\n  \"transportationType\": 1,\n  \"availableDays\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/transportations",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"transportations"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"id\": \"123e4567-e89b-12d3-a456-426614174100\",\n  \"origin\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"name\": \"İstanbul Havalimanı\"\n  },\n  \"destination\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\n    \"name\": \"Sabiha Gökçen Havalimanı\"\n  },\n  \"transportType\": \"BUS\",\n  \"availableDays\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\"],\n  \"createdAt\": \"2023-07-16T10:45:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "3. Update Transportation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{transportationId}}\",\n  \"origin\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"destination\": \"123e4567-e89b-12d3-a456-426614174001\",\n  \"transportationType\": 1,\n  \"availableDays\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\", \"THURSDAY\", \"FRIDAY\", \"SATURDAY\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transportations/{{transportationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transportations",
+								"{{transportationId}}"
+							]
+						},
+						"description": "Mevcut bir ulaşım bilgisini günceller."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Delete Transportation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transportations/{{transportationId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transportations",
+								"{{transportationId}}"
+							]
+						},
+						"description": "Bir ulaşım bilgisini siler."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Get Transportation Types",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/transportations/types",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transportations",
+								"types"
+							]
+						},
+						"description": "Tüm ulaşım türlerini getirir."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/transportations/types",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"transportations",
+										"types"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"items\": [\n    {\n      \"id\": 1,\n      \"name\": \"BUS\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"FLIGHT\"\n    },\n    {\n      \"id\": 3,\n      \"name\": \"UBER\"\n    },\n    {\n      \"id\": 4,\n      \"name\": \"SUBWAY\"\n    }\n  ],\n  \"page\": 0,\n  \"pageSize\": 10,\n  \"total\": 4,\n  \"totalPages\": 1\n}"
+						}
+					]
+				}
+			],
+			"description": "Ulaşım bilgileri yönetimi ile ilgili tüm API işlemleri"
+		},
+		{
+			"name": "🗺️ Route Calculation",
+			"item": [
+				{
+					"name": "Calculate Route",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"originId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"destinationId\": \"123e4567-e89b-12d3-a456-426614174001\",\n  \"selectedDate\": \"2023-07-17\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/routes",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"routes"
+							]
+						},
+						"description": "Verilen başlangıç ve hedef lokasyonları arasında mevcut rotaları hesaplar."
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"originId\": \"123e4567-e89b-12d3-a456-426614174000\",\n  \"destinationId\": \"123e4567-e89b-12d3-a456-426614174001\",\n  \"selectedDate\": \"2023-07-17\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/routes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"routes"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"origin\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174000\",\n    \"name\": \"İstanbul Havalimanı\"\n  },\n  \"destination\": {\n    \"id\": \"123e4567-e89b-12d3-a456-426614174001\",\n    \"name\": \"Sabiha Gökçen Havalimanı\"\n  },\n  \"selectedDate\": \"2023-07-17\",\n  \"availableRoutes\": [\n    {\n      \"transportationType\": \"BUS\",\n      \"estimatedDuration\": \"45 dakika\",\n      \"description\": \"Otobüs ile direkt ulaşım\"\n    },\n    {\n      \"transportationType\": \"UBER\",\n      \"estimatedDuration\": \"35 dakika\",\n      \"description\": \"Uber ile hızlı ulaşım\"\n    }\n  ]\n}"
+						}
+					]
+				}
+			],
+			"description": "Rota hesaplama ile ilgili API işlemleri"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "locationId",
+			"value": "123e4567-e89b-12d3-a456-426614174000",
+			"type": "string"
+		},
+		{
+			"key": "transportationId",
+			"value": "123e4567-e89b-12d3-a456-426614174100",
+			"type": "string"
+		}
+	]
+}

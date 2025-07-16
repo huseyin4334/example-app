@@ -2,6 +2,7 @@ package org.example.routeplaner.domain.model.aggregate;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.example.common.TransportConstants;
 import org.example.common.domain.entity.AggregateRoot;
 import org.example.common.domain.entity.Day;
 
@@ -35,7 +36,7 @@ public class Transportation extends AggregateRoot<UUID> {
         }
 
         if (
-                !transportationType.getName().equals("FLIGHT") &&
+                !transportationType.getName().equals(TransportConstants.FLIGHT) &&
                 !origin.getCity().getCountry().equals(destination.getCity().getCountry())
         ) {
             throw new IllegalArgumentException("Origin and destination must be in the same country.");
