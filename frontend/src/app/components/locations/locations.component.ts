@@ -46,7 +46,7 @@ export class LocationsComponent implements OnInit {
         this.countries = response.items;
       },
       error: (error) => {
-        console.error('Ülkeler yüklenirken hata:', error);
+        this.toastrService.showError('Ülkeler yüklenirken hata:', error);
         // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
       }
     });
