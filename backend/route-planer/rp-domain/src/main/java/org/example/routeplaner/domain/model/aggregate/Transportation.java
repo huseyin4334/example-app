@@ -24,6 +24,9 @@ public class Transportation extends AggregateRoot<UUID> {
         if (destination == null || destination.getId() == null) {
             throw new IllegalArgumentException("Destination location must not be null.");
         }
+        if (origin.getId().equals(destination.getId())) {
+            throw new IllegalArgumentException("Origin and destination must not be the same.");
+        }
         if (transportationType == null || transportationType.getId() == null) {
             throw new IllegalArgumentException("Transportation type must not be null.");
         }

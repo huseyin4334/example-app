@@ -78,7 +78,7 @@
         <div class="form-group">
           <label>Geçerli Günler:</label>
           <div class="days-selection">
-            <div *ngFor="let day of days" class="day-checkbox">
+            <div *ngFor="let day of days" class="day-checkbox" style="margin-bottom: 0px; display: flex;">
               <input
                 type="checkbox"
                 [id]="'new-day-' + day"
@@ -105,7 +105,7 @@
       <div class="form-row">
         <div class="form-group">
           <label for="edit-origin">Başlangıç Lokasyonu:</label>
-          <select
+          <select disabled="true"
             id="edit-origin"
             [(ngModel)]="selectedTransportation.origin"
             name="origin"
@@ -113,14 +113,14 @@
             required>
             <option value="">Lokasyon seçin</option>
             <option *ngFor="let location of locations" [value]="location.id">
-              {{location.name}} ({{location.city}}, {{location.country}})
+              {{location.name}}
             </option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="edit-destination">Varış Lokasyonu:</label>
-          <select
+          <select disabled="true"
             id="edit-destination"
             [(ngModel)]="selectedTransportation.destination"
             name="destination"
@@ -128,7 +128,7 @@
             required>
             <option value="">Lokasyon seçin</option>
             <option *ngFor="let location of locations" [value]="location.id">
-              {{location.name}} ({{location.city}}, {{location.country}})
+              {{location.name}}
             </option>
           </select>
         </div>
@@ -152,7 +152,7 @@
         <div class="form-group">
           <label>Geçerli Günler:</label>
           <div class="days-selection">
-            <div *ngFor="let day of days" class="day-checkbox">
+            <div *ngFor="let day of days" class="day-checkbox" style="margin-bottom: 0px; display: flex;">
               <input
                 type="checkbox"
                 [id]="'edit-day-' + day"
