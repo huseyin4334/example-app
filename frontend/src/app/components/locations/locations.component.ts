@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location, LocationCreateCommand, SearchQuery, BaseListResponse, Country, City } from '../../models/location.model';
 import { LocationService } from '../../services/location.service';
+import { CustomToastrService } from '../../services/toastr.service';
 
 @Component({
   selector: 'app-locations',
@@ -29,7 +30,10 @@ export class LocationsComponent implements OnInit {
     locationCode: ''
   };
 
-  constructor(private locationService: LocationService) {}
+  constructor(
+    private locationService: LocationService,
+    private toastrService: CustomToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadLocations();
@@ -43,6 +47,7 @@ export class LocationsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Ülkeler yüklenirken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
       }
     });
   }
@@ -81,9 +86,13 @@ export class LocationsComponent implements OnInit {
         this.totalPages = response.totalPages;
         this.totalItems = response.total;
         this.loading = false;
+        if (response.items.length == 0) {
+          this.toastrService.showInfo('Hiçbir lokasyon bulunamadı.');
+        }
       },
       error: (error) => {
         console.error('Lokasyonlar yüklenirken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
         this.loading = false;
       }
     });
@@ -135,12 +144,16 @@ export class LocationsComponent implements OnInit {
           this.loadLocations();
           this.resetForm();
           this.loading = false;
+          this.toastrService.showSuccess('Lokasyon başarıyla oluşturuldu.');
         },
         error: (error) => {
           console.error('Lokasyon oluşturulurken hata:', error);
+          // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
           this.loading = false;
         }
       });
+    } else {
+      this.toastrService.showWarning('Lütfen tüm alanları doğru şekilde doldurun.');
     }
   }
 
@@ -152,12 +165,16 @@ export class LocationsComponent implements OnInit {
           this.loadLocations();
           this.resetForm();
           this.loading = false;
+          this.toastrService.showSuccess('Lokasyon başarıyla güncellendi.');
         },
         error: (error) => {
           console.error('Lokasyon güncellenirken hata:', error);
+          // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
           this.loading = false;
         }
       });
+    } else {
+      this.toastrService.showWarning('Lütfen tüm alanları doğru şekilde doldurun.');
     }
   }
 
@@ -168,9 +185,11 @@ export class LocationsComponent implements OnInit {
         next: () => {
           this.loadLocations();
           this.loading = false;
+          this.toastrService.showSuccess('Lokasyon başarıyla silindi.');
         },
         error: (error) => {
           console.error('Lokasyon silinirken hata:', error);
+          // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
           this.loading = false;
         }
       });

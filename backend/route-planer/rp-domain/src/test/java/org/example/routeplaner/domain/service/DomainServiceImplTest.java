@@ -3,6 +3,7 @@ package org.example.routeplaner.domain.service;
 import org.example.common.domain.entity.Day;
 import org.example.routeplaner.domain.exception.RouteDomainException;
 import org.example.routeplaner.domain.model.aggregate.*;
+import org.example.routeplaner.domain.ports.output.repository.AirportRepository;
 import org.example.routeplaner.domain.ports.output.repository.TransportationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,12 +17,14 @@ import static org.mockito.ArgumentMatchers.any;
 class DomainServiceImplTest {
 
     TransportationRepository transportationRepository;
+    AirportRepository airportRepository;
     DomainServiceImpl domainService;
 
     @BeforeEach
     void setUp() {
         transportationRepository = Mockito.mock(TransportationRepository.class);
-        domainService = new DomainServiceImpl(transportationRepository);
+        airportRepository = Mockito.mock(AirportRepository.class);
+        domainService = new DomainServiceImpl(transportationRepository, airportRepository);
     }
 
     @Test

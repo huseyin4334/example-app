@@ -26,21 +26,21 @@ public class TransportationController {
 
 
     @PutMapping
-    public ResponseEntity<Void> createLocation(@Valid @RequestBody TransportationCreateCommand command) {
+    public ResponseEntity<Void> createTransportation(@Valid @RequestBody TransportationCreateCommand command) {
         transportationApplicationService.create(command);
         return ResponseEntity.ok().build();
     }
 
 
     @PostMapping
-    public ResponseEntity<Void> updateLocation(@Valid @RequestBody TransportationUpdateCommand command) {
+    public ResponseEntity<Void> updateTransportation(@Valid @RequestBody TransportationUpdateCommand command) {
         transportationApplicationService.update(command);
         return ResponseEntity.ok().build();
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLocation(
+    public ResponseEntity<Void> deleteTransportation(
             @PathVariable String id
     ) {
         transportationApplicationService.delete(new DeleteCommand<>(UUID.fromString(id)));
@@ -49,7 +49,7 @@ public class TransportationController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<TransportationResponse> getLocation(
+    public ResponseEntity<TransportationResponse> getTransportation(
             @PathVariable String id
     ) {
         // Assuming a method exists in the service to fetch a location by ID
@@ -59,7 +59,7 @@ public class TransportationController {
 
 
     @PostMapping("/page")
-    public ResponseEntity<BaseListResponse<TransportationResponse>> searchLocation(@RequestBody SearchQuery searchQuery) {
+    public ResponseEntity<BaseListResponse<TransportationResponse>> searchTransportation(@RequestBody SearchQuery searchQuery) {
         BaseListResponse<TransportationResponse> location = transportationApplicationService.list(searchQuery);
         return ResponseEntity.ok(location);
     }

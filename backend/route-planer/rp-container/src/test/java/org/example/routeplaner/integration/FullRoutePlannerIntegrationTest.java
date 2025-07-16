@@ -5,9 +5,11 @@ import org.example.common.domain.entity.Day;
 import org.example.routeplaner.application.dto.command.location.LocationCreateCommand;
 import org.example.routeplaner.application.dto.command.route.AvailableRoutesQuery;
 import org.example.routeplaner.domain.ports.output.repository.LocationRepository;
+import org.example.routeplaner.infrastructure.persistence.entity.AirportEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CityEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CountryEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.TransportationTypeEntity;
+import org.example.routeplaner.infrastructure.persistence.repository.AirportEntityRepository;
 import org.example.routeplaner.infrastructure.persistence.repository.CityEntityRepository;
 import org.example.routeplaner.infrastructure.persistence.repository.CountryEntityRepository;
 import org.example.routeplaner.infrastructure.persistence.repository.TransportationTypeEntityRepository;
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
@@ -29,6 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Profile("test")
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -50,6 +54,9 @@ class FullRoutePlannerIntegrationTest {
     TransportationTypeEntityRepository transportationTypeEntityRepository;
 
     @Autowired
+    private AirportEntityRepository airportEntityRepository;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     String originId;
@@ -61,31 +68,47 @@ class FullRoutePlannerIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        if (originId != null)
-            return;
-
-
         // Create locations
         createCityAndCountries();
         createTransportationTypes();
 
-        originId = createLocation("Origin City", "ORI");
-        airportAId = createLocation("Airport A", "ANK");
-        airportBId = createLocation("Airport B", "IZM");
-        destinationId = createLocation("Destination City", "ANT");
+        createAirportEntities();
+
+        originId = createLocation("Origin City", "3W2Q+4X", cityIdList.get("Istanbul"));
+        airportAId = createLocation("Airport A", "ANK", cityIdList.get("Istanbul"));
+        airportBId = createLocation("Airport B", "IZM", cityIdList.get("Ankara"));
+        destinationId = createLocation("Destination City", "X8VQ+XW", cityIdList.get("Ankara"));
 
         // Create transportations with type IDs instead of enum values
-        // Origin -> AirportA (BUS, MONDAY, FRIDAY)
-        createTransportation(originId, airportAId, cityIdList.get("Istanbul"), Arrays.asList(Day.MONDAY, Day.FRIDAY), transportationTypeList.get("BUS"));
-        // AirportA -> AirportB (FLIGHT, MONDAY)
-        createTransportation(airportAId, airportBId, cityIdList.get("Ankara"), List.of(Day.MONDAY), transportationTypeList.get("FLIGHT"));
-        // AirportB -> Destination (BUS, MONDAY, FRIDAY)
-        createTransportation(airportBId, destinationId, cityIdList.get("Istanbul"), Arrays.asList(Day.MONDAY, Day.FRIDAY), transportationTypeList.get("BUS"));
+        // Origin -> AirportA (BUS, MONDAY, WEDNESDAY, FRIDAY, SUNDAY)
+        createTransportation(originId, airportAId,
+                Arrays.asList(Day.MONDAY, Day.WEDNESDAY, Day.FRIDAY, Day.SUNDAY),
+                transportationTypeList.get("BUS")
+        );
+        // AirportA -> AirportB (FLIGHT, MONDAY, FRIDAY)
+        createTransportation(airportAId, airportBId,
+                List.of(Day.MONDAY, Day.FRIDAY),
+                transportationTypeList.get("FLIGHT")
+        );
+        // AirportB -> Destination (BUS, MONDAY, FRIDAY, SATURDAY, SUNDAY)
+        createTransportation(airportBId, destinationId,
+                Arrays.asList(Day.MONDAY, Day.FRIDAY, Day.SATURDAY, Day.SUNDAY),
+                transportationTypeList.get("BUS")
+        );
+    }
 
-        // Origin -> AirportB (BUS, FRIDAY)
-        createTransportation(originId, airportBId, cityIdList.get("Istanbul"), List.of(Day.FRIDAY), transportationTypeList.get("BUS"));
-        // AirportA -> Destination (BUS, MONDAY)
-        createTransportation(airportAId, destinationId, cityIdList.get("Istanbul"), List.of(Day.MONDAY), transportationTypeList.get("BUS"));
+    private void createAirportEntities() {
+        AirportEntity airportEntity = new AirportEntity();
+        airportEntity.setCode("ANK");
+        airportEntity.setName("Airport A");
+        airportEntity.setCity(cityEntityRepository.findById(cityIdList.get("Istanbul")).orElseThrow());
+        airportEntityRepository.save(airportEntity);
+
+        airportEntity = new AirportEntity();
+        airportEntity.setCode("IZM");
+        airportEntity.setName("Airport B");
+        airportEntity.setCity(cityEntityRepository.findById(cityIdList.get("Ankara")).orElseThrow());
+        airportEntityRepository.save(airportEntity);
     }
 
     private void createTransportationTypes() {
@@ -124,8 +147,8 @@ class FullRoutePlannerIntegrationTest {
         cityIdList.put("Ankara", city.getId());
     }
 
-    String createLocation(String name, String code) throws Exception {
-        LocationCreateCommand cmd = new LocationCreateCommand(null, name, 1L, code);
+    String createLocation(String name, String code, Long cityId) throws Exception {
+        LocationCreateCommand cmd = new LocationCreateCommand(null, name, cityId, code);
         mockMvc.perform(put("/locations")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(cmd)))
@@ -138,16 +161,19 @@ class FullRoutePlannerIntegrationTest {
                 .orElseThrow(() -> new RuntimeException("Location not found: " + name));
     }
 
-    void createTransportation(String from, String to, Long type, List<Day> days, long transportationTypeId) throws Exception {
-        // Manuel olarak JSON oluştur
-        String json = String.format(
-            "{\"origin\":\"%s\",\"destination\":\"%s\",\"transportationType\":%d,\"availableDays\":%s}",
-            from, to, type, objectMapper.writeValueAsString(days)
-        );
+    void createTransportation(String from, String to, List<Day> days, long transportationTypeId) throws Exception {
+        String body = """
+                {
+                    "origin": "%s",
+                    "destination": "%s",
+                    "availableDays": %s,
+                    "transportationType": %d
+                }
+                """.formatted(from, to, objectMapper.writeValueAsString(days), transportationTypeId);
 
         mockMvc.perform(put("/transportations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
                 .andExpect(status().isOk());
     }
 
@@ -157,7 +183,9 @@ class FullRoutePlannerIntegrationTest {
         AvailableRoutesQuery queryMonday = new AvailableRoutesQuery();
         queryMonday.setOriginId(originId);
         queryMonday.setDestinationId(destinationId);
-        queryMonday.setSelectedDate(new java.util.Date());
+        // 14.07.2025
+        Date date = Date.from(LocalDateTime.of(2025, 7, 14, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
+        queryMonday.setSelectedDate(date);
 
         mockMvc.perform(post("/routes")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -172,7 +200,9 @@ class FullRoutePlannerIntegrationTest {
         AvailableRoutesQuery queryFriday = new AvailableRoutesQuery();
         queryFriday.setOriginId(originId);
         queryFriday.setDestinationId(destinationId);
-        queryFriday.setSelectedDate(new java.util.Date());
+        // 18.07.2025
+        Date date = Date.from(LocalDateTime.of(2025, 7, 18, 0, 0).atZone(ZoneId.systemDefault()).toInstant());
+        queryFriday.setSelectedDate(date);
 
         mockMvc.perform(post("/routes")
                         .contentType(MediaType.APPLICATION_JSON)

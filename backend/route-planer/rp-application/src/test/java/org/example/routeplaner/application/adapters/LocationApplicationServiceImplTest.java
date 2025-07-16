@@ -11,6 +11,7 @@ import org.example.routeplaner.application.ports.output.LocationApplicationRepos
 import org.example.routeplaner.domain.model.aggregate.City;
 import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.domain.ports.output.repository.LocationRepository;
+import org.example.routeplaner.domain.service.DomainService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,13 +27,15 @@ class LocationApplicationServiceImplTest {
     private LocationMapper locationMapper;
     private LocationApplicationRepository locationApplicationRepository;
     private LocationApplicationServiceImpl service;
+    private DomainService domainService;
 
     @BeforeEach
     void setUp() {
         locationRepository = mock(LocationRepository.class);
         locationMapper = mock(LocationMapper.class);
         locationApplicationRepository = mock(LocationApplicationRepository.class);
-        service = new LocationApplicationServiceImpl(locationRepository, locationApplicationRepository, locationMapper);
+        domainService = mock(DomainService.class);
+        service = new LocationApplicationServiceImpl(locationRepository, locationApplicationRepository, locationMapper, domainService);
     }
 
     @Test
@@ -41,7 +44,7 @@ class LocationApplicationServiceImplTest {
         Location location = new Location();
         location.setId(UUID.randomUUID());
         location.setName("Name");
-        location.setLocationCode("CODE");
+        location.setLocationCode("SAW");
         City city = new City();
         city.setId(2L);
         location.setCity(city);

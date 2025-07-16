@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AvailableRoutesQuery, AvailableRoutesResponse, SearchableLocationResponse } from '../../models/route.model';
 import { RouteService } from '../../services/route.service';
+import { CustomToastrService } from '../../services/toastr.service';
 
 @Component({
   selector: 'app-route-calculator',
@@ -22,7 +23,8 @@ export class RouteCalculatorComponent implements OnInit {
   selectedDate: string = new Date().toISOString().split('T')[0];
 
   constructor(
-    private routeService: RouteService
+    private routeService: RouteService,
+    private toastrService: CustomToastrService
   ) {}
 
   ngOnInit(): void {
@@ -33,9 +35,13 @@ export class RouteCalculatorComponent implements OnInit {
     this.routeService.getAllSearchableLocations().subscribe({
       next: (response) => {
         this.locations = response.items;
+        if (response.items.length == 0) {
+          this.toastrService.showInfo('Hiçbir lokasyon bulunamadı.');
+        }
       },
       error: (error) => {
         console.error('Lokasyonlar yüklenirken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
         this.error = 'Lokasyonlar yüklenirken hata oluştu.';
       }
     });
@@ -48,16 +54,19 @@ export class RouteCalculatorComponent implements OnInit {
 
   calculateRoute(): void {
     if (!this.routeRequest.originId || !this.routeRequest.destinationId) {
+      this.toastrService.showWarning('Lütfen başlangıç ve hedef lokasyonlarını seçin.');
       this.error = 'Lütfen başlangıç ve hedef lokasyonlarını seçin.';
       return;
     }
     
     if (this.routeRequest.originId === this.routeRequest.destinationId) {
+      this.toastrService.showWarning('Başlangıç ve hedef lokasyonları aynı olamaz.');
       this.error = 'Başlangıç ve hedef lokasyonları aynı olamaz.';
       return;
     }
 
     if (!this.selectedDate) {
+      this.toastrService.showWarning('Lütfen bir tarih seçin.');
       this.error = 'Lütfen bir tarih seçin.';
       return;
     }
@@ -74,11 +83,15 @@ export class RouteCalculatorComponent implements OnInit {
         this.routeResult = data;
         this.isCalculating = false;
         if (!data.availableRoutes || data.availableRoutes.length === 0) {
+          this.toastrService.showInfo('Seçilen kriterlere uygun rota bulunamadı.');
           this.error = 'Seçilen kriterlere uygun rota bulunamadı.';
+        } else {
+          this.toastrService.showSuccess(`${data.availableRoutes.length} adet rota bulundu.`);
         }
       },
       error: (error) => {
         console.error('Rota hesaplanırken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
         this.error = 'Rota hesaplanırken bir hata oluştu. Lütfen tekrar deneyin.';
         this.isCalculating = false;
       }
@@ -94,6 +107,7 @@ export class RouteCalculatorComponent implements OnInit {
     this.selectedDate = new Date().toISOString().split('T')[0]; // String olarak initialize et
     this.routeResult = null;
     this.error = null;
+    this.toastrService.showInfo('Form sıfırlandı.');
   }
 
   getLocationName(locationId: string): string {

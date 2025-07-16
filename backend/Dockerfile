@@ -3,7 +3,10 @@ FROM maven:3.8.5-openjdk-17 AS build
 COPY . /home/build
 WORKDIR /home/build
 USER root
-RUN --mount=type=cache,target=/root/.m2 mvn clean package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -Dmaven.wagon.http.ssl.insecure=true \
+        -Dmaven.wagon.http.ssl.allowall=true \
+        clean package -DskipTests
 
 # Runtime stage
 FROM openjdk:17-jdk-slim AS runtime

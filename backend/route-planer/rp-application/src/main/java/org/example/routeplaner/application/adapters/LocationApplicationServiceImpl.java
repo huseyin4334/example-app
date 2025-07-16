@@ -14,6 +14,7 @@ import org.example.routeplaner.application.ports.input.LocationApplicationServic
 import org.example.routeplaner.application.ports.output.LocationApplicationRepository;
 import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.domain.ports.output.repository.LocationRepository;
+import org.example.routeplaner.domain.service.DomainService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,12 +28,13 @@ public class LocationApplicationServiceImpl implements LocationApplicationServic
     private final LocationRepository locationRepository;
     private final LocationApplicationRepository locationApplicationRepository;
     private final LocationMapper locationMapper;
+    private final DomainService domainService;
 
     @Transactional
     @Override
     public void create(LocationCreateCommand command) {
         Location location = locationMapper.toDomain(command);
-        location.isValid();
+        domainService.initiateLocation(location);
         locationRepository.save(location);
     }
 
@@ -40,10 +42,12 @@ public class LocationApplicationServiceImpl implements LocationApplicationServic
     @Override
     public void update(LocationCreateCommand command) {
         Location location = locationMapper.toDomain(command);
-        location.isValid();
+
         if (location.getId() == null) {
             throw new IllegalArgumentException("Location ID must not be null for update.");
         }
+
+        domainService.initiateLocation(location);
         locationRepository.update(location);
     }
 

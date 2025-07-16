@@ -25,6 +25,7 @@
         <java.version>17</java.version>
         <apache.commons.collections4.version>4.5.0</apache.commons.collections4.version>
         <springdoc-openapi.version>2.8.5</springdoc-openapi.version>
+        <openlocationcode.version>1.0.4</openlocationcode.version>
     </properties>
 
     <dependencyManagement>
@@ -51,6 +52,13 @@
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc-openapi.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.google.openlocationcode/openlocationcode -->
+            <dependency>
+                <groupId>com.google.openlocationcode</groupId>
+                <artifactId>openlocationcode</artifactId>
+                <version>${openlocationcode.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

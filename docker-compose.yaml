@@ -25,6 +25,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: route-planner-backend
+    environment:
+      - PROFILE=container
     ports:
       - "8080:8080"
     depends_on:

@@ -3,6 +3,7 @@ import { TransportationCreateCommand, TransportationResponse, TransportationType
 import { Location, SearchQuery, BaseListResponse } from '../../models/location.model';
 import { TransportService } from '../../services/transport.service';
 import { LocationService } from '../../services/location.service';
+import { CustomToastrService } from '../../services/toastr.service';
 
 @Component({
   selector: 'app-transports',
@@ -37,7 +38,8 @@ export class TransportsComponent implements OnInit {
 
   constructor(
     private transportService: TransportService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private toastrService: CustomToastrService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,7 @@ export class TransportsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Ulaşım türleri yüklenirken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
       }
     });
   }
@@ -72,9 +75,13 @@ export class TransportsComponent implements OnInit {
         this.totalPages = response.totalPages;
         this.totalItems = response.total;
         this.loading = false;
+        if (response.items.length == 0) {
+          this.toastrService.showInfo('Hiçbir ulaşım seçeneği bulunamadı.');
+        }
       },
       error: (error) => {
         console.error('Ulaşım bilgileri yüklenirken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
         this.loading = false;
       }
     });
@@ -84,9 +91,13 @@ export class TransportsComponent implements OnInit {
     this.locationService.getAllSearchableLocations().subscribe({
       next: (response: BaseListResponse<Location>) => {
         this.locations = response.items;
+        if (response.items.length == 0) {
+          this.toastrService.showInfo('Hiçbir lokasyon bulunamadı.');
+        }
       },
       error: (error) => {
         console.error('Lokasyonlar yüklenirken hata:', error);
+        // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
       }
     });
   }
@@ -123,12 +134,16 @@ export class TransportsComponent implements OnInit {
           this.loadTransportations();
           this.resetForm();
           this.loading = false;
+          this.toastrService.showSuccess('Ulaşım bilgisi başarıyla oluşturuldu.');
         },
         error: (error) => {
           console.error('Ulaşım bilgisi oluşturulurken hata:', error);
+          // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
           this.loading = false;
         }
       });
+    } else {
+      this.toastrService.showWarning('Lütfen tüm alanları doğru şekilde doldurun.');
     }
   }
 
@@ -140,12 +155,16 @@ export class TransportsComponent implements OnInit {
           this.loadTransportations();
           this.resetForm();
           this.loading = false;
+          this.toastrService.showSuccess('Ulaşım bilgisi başarıyla güncellendi.');
         },
         error: (error) => {
           console.error('Ulaşım bilgisi güncellenirken hata:', error);
+          // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
           this.loading = false;
         }
       });
+    } else {
+      this.toastrService.showWarning('Lütfen tüm alanları doğru şekilde doldurun.');
     }
   }
 
@@ -156,9 +175,11 @@ export class TransportsComponent implements OnInit {
         next: () => {
           this.loadTransportations();
           this.loading = false;
+          this.toastrService.showSuccess('Ulaşım bilgisi başarıyla silindi.');
         },
         error: (error) => {
           console.error('Ulaşım bilgisi silinirken hata:', error);
+          // Hata mesajı BaseApiService tarafından otomatik olarak gösterilecek
           this.loading = false;
         }
       });

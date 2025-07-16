@@ -1,32 +1,27 @@
-# Frontend Dockerfile - Multi-stage build for Angular
-FROM node:18-alpine AS build
-
-# Set working directory
+# base image
+FROM node:16.13.0 AS build
 WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci --only=production
-
-# Copy source code
-COPY . .
-
-# Build the Angular application for production
+COPY package.json package-lock.json ./
+RUN npm install
+COPY . /app
 RUN npm run build
 
-# Production stage - Nginx to serve static files
-FROM nginx:alpine
+### STAGE 2: Run ###
+FROM nginxinc/nginx-unprivileged:1.25-alpine
 
-# Copy built application from build stage
-COPY --from=build /app/dist/location-transport-app /usr/share/nginx/html
+USER root
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN apk -U upgrade
 
-# Expose port 80
-EXPOSE 80
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY --from=build /app/dist/ /usr/share/nginx/html
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /app
+RUN chown -R 1001:1001 /app && chmod -R 755 /app && \
+        chown -R 1001:1001 /var/cache/nginx && \
+        chown -R 1001:1001 /var/log/nginx && \
+        chown -R 1001:1001 /etc/nginx/conf.d
+RUN touch /var/run/nginx.pid && \
+        chown -R 1001:1001 /var/run/nginx.pid
+
+USER 1001

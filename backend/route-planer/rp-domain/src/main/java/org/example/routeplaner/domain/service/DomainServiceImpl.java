@@ -1,12 +1,15 @@
 package org.example.routeplaner.domain.service;
 
+import com.google.openlocationcode.OpenLocationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.common.domain.entity.Day;
 import org.example.routeplaner.domain.exception.RouteDomainException;
+import org.example.routeplaner.domain.model.aggregate.Location;
 import org.example.routeplaner.domain.model.aggregate.Route;
 import org.example.routeplaner.domain.model.aggregate.Transportation;
 import org.example.routeplaner.domain.model.criteria.LocationCriteria;
+import org.example.routeplaner.domain.ports.output.repository.AirportRepository;
 import org.example.routeplaner.domain.ports.output.repository.TransportationRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,7 @@ import java.util.stream.Collectors;
 public class DomainServiceImpl implements DomainService {
 
     private final TransportationRepository transportationRepository;
+    private final AirportRepository airportRepository;
 
     @Override
     public List<Route> routePlaner(
@@ -120,5 +124,18 @@ public class DomainServiceImpl implements DomainService {
         locationCriteria.setAvailableDay(availableDay);
 
         return transportationRepository.getOriginsByCriteria(locationCriteria);
+    }
+
+    @Override
+    public void initiateLocation(Location location) {
+        location.isValid();
+        if (!airportRepository.isExistAirportByCodeAndCity(location.getLocationCode(), location.getCity()))
+            if (!OpenLocationCode.isValidCode(location.getLocationCode()))
+                throw new RouteDomainException(
+                        String.format(
+                        "Location with code %s and city %s is not matched",
+                        location.getLocationCode(),
+                        location.getCity().getName()
+                ));
     }
 }

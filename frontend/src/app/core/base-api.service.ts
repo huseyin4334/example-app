@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { CustomToastrService } from '../services/toastr.service';
 
 export interface ApiResponse<T> {
   data: T;
@@ -24,7 +25,10 @@ export interface RequestOptions {
 export class BaseApiService {
   private baseUrl = environment.apiUrl; // Environment'dan alır
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private toastrService: CustomToastrService
+  ) {}
 
   /**
    * Base URL'i ayarlar
@@ -278,33 +282,42 @@ export class BaseApiService {
     
     if (error.error instanceof ErrorEvent) {
       // Client-side error
-      errorMessage = `Client Error: ${error.error.message}`;
+      errorMessage = `İstemci Hatası: ${error.error.message}`;
     } else {
       // Server-side error
       switch (error.status) {
         case 400:
-          errorMessage = 'Geçersiz istek (400)';
+          errorMessage = 'Geçersiz istek. Lütfen girdiğiniz bilgileri kontrol edin.';
           break;
         case 401:
-          errorMessage = 'Yetkisiz erişim (401)';
+          errorMessage = 'Yetkisiz erişim. Lütfen giriş yapın.';
           break;
         case 403:
-          errorMessage = 'Yasaklanmış erişim (403)';
+          errorMessage = 'Bu işlemi gerçekleştirmek için yetkiniz bulunmuyor.';
           break;
         case 404:
-          errorMessage = 'Kaynak bulunamadı (404)';
+          errorMessage = 'İstenen kaynak bulunamadı.';
           break;
         case 500:
-          errorMessage = 'Sunucu hatası (500)';
+          errorMessage = 'Sunucu hatası. Lütfen daha sonra tekrar deneyin.';
+          break;
+        case 503:
+          errorMessage = 'Servis şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.';
           break;
         default:
-          errorMessage = `Server Error: ${error.status} - ${error.message}`;
+          errorMessage = `Bir hata oluştu (${error.status}). Lütfen tekrar deneyin.`;
       }
       
+      // Backend'den gelen spesifik hata mesajı varsa onu kullan
       if (error.error?.message) {
-        errorMessage += ` - ${error.error.message}`;
+        errorMessage = error.error.message;
+      } else if (error.error?.error) {
+        errorMessage = error.error.error;
       }
     }
+
+    // Toastr ile hata mesajını göster
+    this.toastrService.showError(errorMessage);
 
     console.error('HTTP Error:', errorMessage, error);
     return throwError(() => new Error(errorMessage));
