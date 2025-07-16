@@ -9,9 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.routeplaner.infrastructure.persistence.entity.AirportEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CityEntity;
 import org.example.routeplaner.infrastructure.persistence.entity.CountryEntity;
+import org.example.routeplaner.infrastructure.persistence.entity.TransportationTypeEntity;
 import org.example.routeplaner.infrastructure.persistence.repository.AirportEntityRepository;
 import org.example.routeplaner.infrastructure.persistence.repository.CityEntityRepository;
 import org.example.routeplaner.infrastructure.persistence.repository.CountryEntityRepository;
+import org.example.routeplaner.infrastructure.persistence.repository.TransportationTypeEntityRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
@@ -32,6 +34,7 @@ public class DataLoader implements CommandLineRunner {
     private final CountryEntityRepository countryEntityRepository;
     private final CityEntityRepository cityEntityRepository;
     private final AirportEntityRepository airportEntityRepository;
+    private final TransportationTypeEntityRepository transportationTypeEntityRepository;
     private final ObjectMapper objectMapper;
 
     private Map<String, CityEntity> cityEntities = new HashMap<>();
@@ -55,9 +58,30 @@ public class DataLoader implements CommandLineRunner {
         // Load airports from JSON files
         loadAirportsAndCities();
 
+        // Load transportation types
+        loadTransportationTypes();
+
         // Clear Local Maps
         cityEntities = null;
         countryEntities = null;
+    }
+
+    private void loadTransportationTypes() {
+        TransportationTypeEntity type = new TransportationTypeEntity();
+        type.setName("BUS");
+        transportationTypeEntityRepository.save(type);
+
+        type = new TransportationTypeEntity();
+        type.setName("TRAIN");
+        transportationTypeEntityRepository.save(type);
+
+        type = new TransportationTypeEntity();
+        type.setName("FLIGHT");
+        transportationTypeEntityRepository.save(type);
+
+        type = new TransportationTypeEntity();
+        type.setName("UBER");
+        transportationTypeEntityRepository.save(type);
     }
 
     private void loadAirportsAndCities() throws IOException {
